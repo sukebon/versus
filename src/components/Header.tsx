@@ -1,4 +1,4 @@
-import { Box, Flex } from '@chakra-ui/react';
+import { Box, Flex, Text } from '@chakra-ui/react';
 import React from 'react';
 
 const Header = () => {
@@ -7,10 +7,15 @@ const Header = () => {
       alignItems='center'
       p={3}
       w='100%'
-      h={12}
-      backgroundColor='facebook.300'
+      h='50px'
+      position='sticky'
+      top={0}
+      backgroundColor='facebook.500'
+      zIndex={100}
     >
-      header
+      <Text color='white' fontWeight='bold'>
+        DAIMARU HAKUI
+      </Text>
     </Flex>
   );
 };

@@ -4,6 +4,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useState } from 'react';
 import Layout from '../components/Layout';
+import Sidebar from '../components/Sidebar';
 
 const Home: NextPage = () => {
   const [leftImage, setLeftImage] = useState('');
