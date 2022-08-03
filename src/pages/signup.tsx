@@ -8,25 +8,45 @@ import {
   Text,
 } from '@chakra-ui/react';
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebase/index';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { setDoc, doc } from 'firebase/firestore';
+import { auth, db } from '../../firebase/index';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-const Login = () => {
+const SignUp = () => {
   const router = useRouter();
   const [spinner, setSpinner] = useState(false);
+  const [toggle, setToggle] = useState(true);
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const signInUser = () => {
+  //登録
+  const createUser = () => {
     setSpinner(true);
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(async (userCredential) => {
         // Signed in
         const user = userCredential.user;
+        console.log(userCredential.user);
+        try {
+          const docRef = await setDoc(
+            doc(db, 'users', userCredential.user.uid),
+            {
+              uid: userCredential.user.uid,
+              username,
+              email,
+            }
+          );
+          window.alert('成功しました。');
+        } catch (e) {
+          console.error('Error adding document: ', e);
+        } finally {
+          setSpinner(false);
+        }
         router.push('/dashboard');
-        window.alert('成功しました');
+        console.log('登録');
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -70,13 +90,21 @@ const Login = () => {
           color='white'
           fontSize='2xl'
         >
-          Sign in
+          アカウント作成
         </Flex>
         <Flex flexDirection='column' justifyContent='space-around' px={6}>
           <Input
             type='text'
             w='100%'
-            mt={0}
+            backgroundColor='rgb(232 240 254)'
+            placeholder='ユーザー名'
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <Input
+            type='text'
+            w='100%'
+            mt={3}
             backgroundColor='rgb(232 240 254)'
             placeholder='メールアドレス'
             value={email}
@@ -91,30 +119,27 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-
           <Button
             mt={3}
             color='white'
             backgroundColor='facebook.600'
             _hover={{ backgroundColor: 'facebook.500' }}
-            disabled={!email || !password}
-            onClick={signInUser}
+            onClick={createUser}
+            disabled={!username || !email || !email}
           >
-            ログイン
+            新規登録
           </Button>
           <Box my={3} fontSize='xs' color='whiteAlpha.900' textAlign='center'>
-            アカウントをお持ちでないですか？
-            <Link href='/signup'>
-              <a>
-                <Text
-                  as='span'
-                  ml={2}
-                  textDecoration='underline'
-                  cursor='pointer'
-                >
-                  新規登録
-                </Text>
-              </a>
+            すでにアカウントをお持ちですか？
+            <Link href='/login'>
+              <Text
+                as='span'
+                ml={2}
+                textDecoration='underline'
+                cursor='pointer'
+              >
+                ログイン
+              </Text>
             </Link>
           </Box>
         </Flex>
@@ -123,4 +148,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;
