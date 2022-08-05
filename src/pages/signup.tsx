@@ -8,7 +8,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../../firebase/index';
 import { useRouter } from 'next/router';
@@ -25,37 +25,33 @@ const SignUp = () => {
   //登録
   const createUser = () => {
     setSpinner(true);
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(async (userCredential) => {
+    createUserWithEmailAndPassword(auth, email, password).then(
+      async (userCredential) => {
         // Signed in
-        const user = userCredential.user;
-        console.log(userCredential.user);
-        try {
-          const docRef = await setDoc(
-            doc(db, 'users', userCredential.user.uid),
-            {
-              uid: userCredential.user.uid,
-              username,
-              email,
-            }
-          );
-          window.alert('成功しました。');
-        } catch (e) {
-          console.error('Error adding document: ', e);
-        } finally {
-          setSpinner(false);
-        }
-        router.push('/dashboard');
-        console.log('登録');
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        window.alert('失敗ししました');
-      })
-      .finally(() => {
-        setSpinner(false);
-      });
+        updateProfile(userCredential.user, {
+          displayName: username,
+          photoURL: '',
+        })
+          .then(() => {
+            console.log(userCredential.user);
+          })
+          .catch(() => {})
+          .finally(() => {
+            window.alert('成功しました。');
+            router.push('/dashboard');
+            setSpinner(false);
+          });
+
+        // const docRef = await setDoc(
+        //   doc(db, 'users', userCredential.user.uid),
+        //   {
+        //     uid: userCredential.user.uid,
+        //     username,
+        //     email,
+        //   }
+        // );
+      }
+    );
   };
 
   return (

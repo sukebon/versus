@@ -16,17 +16,7 @@ import { auth } from '../../firebase';
 
 const MenuButtonList = ({ user }: any) => {
   const router = useRouter();
-  const logout = () => {
-    auth
-      .signOut()
-      .then(() => {
-        console.log('ログアウトしました。');
-        router.push('login');
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+
   return (
     <Menu>
       <MenuButton
@@ -44,21 +34,27 @@ const MenuButtonList = ({ user }: any) => {
           fontSize='xs'
         >
           <Box>マイアカウント</Box>
-          <Box>{user.email}</Box>
+          <Box>{user.displayName}</Box>
         </Flex>
       </MenuButton>
       <MenuList>
-        <MenuItem minH='40px'>
-          <Link href='/dashboard'>
-            <a>
+        <Link href='/dashboard'>
+          <a>
+            <MenuItem minH='40px'>
               <Box as='span' mr={3} fontSize='xs'>
                 ダッシュボード
               </Box>
-            </a>
-          </Link>
-        </MenuItem>
-        <MenuItem minH='40px'>
-          <Box as='span' mr={3} fontSize='xs' onClick={logout}>
+            </MenuItem>
+          </a>
+        </Link>
+        <MenuItem
+          minH='40px'
+          onClick={async () => {
+            await auth.signOut();
+            router.push('/login');
+          }}
+        >
+          <Box as='span' mr={3} fontSize='xs'>
             ログアウト
           </Box>
         </MenuItem>

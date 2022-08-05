@@ -11,12 +11,13 @@ const Header = () => {
 
   return (
     <Flex
+      as='header'
       alignItems='center'
       justifyContent='space-between'
       p={3}
       w='100%'
       h='70px'
-      position='sticky'
+      position='fixed'
       top={0}
       backgroundColor='facebook.500'
       zIndex={100}

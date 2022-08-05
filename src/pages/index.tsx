@@ -63,7 +63,6 @@ const Home: NextPage = () => {
           <Flex
             w='100%'
             maxW='1000px'
-            mt={12}
             mx='auto'
             justifyContent='center'
             alignItems='center'

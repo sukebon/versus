@@ -38,7 +38,7 @@ const New = () => {
             <Flex
               position='fixed'
               width='100%'
-              height='80vh'
+              height='100vh'
               justifyContent='center'
               alignItems='center'
               zIndex={10}
@@ -55,15 +55,21 @@ const New = () => {
               />
             </Flex>
           )}
-          <Box h='100vh' backgroundColor='#f7f7f7' position='relative'>
-            <Container>
-              <Flex flexDirection='column' alignItems='center' p={12}>
+          <Box
+            h='100vh'
+            backgroundColor='#f7f7f7'
+            pt='70px'
+            position='relative'
+          >
+            <Container mt={12}>
+              <Flex flexDirection='column' alignItems='center'>
                 <Box as='h1'>サービス情報を入力</Box>
                 <Box as='h2'>下記入力欄を記入してください。</Box>
               </Flex>
               <Flex
                 flexDirection='column'
                 alignItems='left'
+                mt={6}
                 p={12}
                 backgroundColor='white'
                 borderRadius={6}
