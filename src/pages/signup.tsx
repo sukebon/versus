@@ -13,6 +13,7 @@ import { setDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../../firebase/index';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import Layout from '../components/Layout';
 
 const SignUp = () => {
   const router = useRouter();
@@ -37,19 +38,9 @@ const SignUp = () => {
           })
           .catch(() => {})
           .finally(() => {
-            window.alert('成功しました。');
             router.push('/dashboard');
             setSpinner(false);
           });
-
-        // const docRef = await setDoc(
-        //   doc(db, 'users', userCredential.user.uid),
-        //   {
-        //     uid: userCredential.user.uid,
-        //     username,
-        //     email,
-        //   }
-        // );
       }
     );
   };
@@ -61,7 +52,6 @@ const SignUp = () => {
       alignItems='center'
       justifyContent='center'
       px={6}
-      backgroundColor='gray.900'
       position='relative'
     >
       {spinner && (
@@ -76,70 +66,76 @@ const SignUp = () => {
           style={{ transform: 'translate(-50%,-50%)' }}
         />
       )}
-
-      <Container maxW='400px' p={0} backgroundColor='gray.800' borderRadius={6}>
-        <Flex
-          w='100%'
-          h='70px'
-          justifyContent='center'
-          alignItems='center'
-          color='white'
-          fontSize='2xl'
+      <Layout>
+        <Container
+          maxW='400px'
+          p={0}
+          backgroundColor='#122449'
+          borderRadius={6}
         >
-          アカウント作成
-        </Flex>
-        <Flex flexDirection='column' justifyContent='space-around' px={6}>
-          <Input
-            type='text'
+          <Flex
             w='100%'
-            backgroundColor='rgb(232 240 254)'
-            placeholder='ユーザー名'
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <Input
-            type='text'
-            w='100%'
-            mt={3}
-            backgroundColor='rgb(232 240 254)'
-            placeholder='メールアドレス'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <Input
-            type='password'
-            w='100%'
-            mt={3}
-            backgroundColor='rgb(232 240 254)'
-            placeholder='パスワード'
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <Button
-            mt={3}
+            h='70px'
+            justifyContent='center'
+            alignItems='center'
             color='white'
-            backgroundColor='facebook.600'
-            _hover={{ backgroundColor: 'facebook.500' }}
-            onClick={createUser}
-            disabled={!username || !email || !email}
+            fontSize='2xl'
           >
-            新規登録
-          </Button>
-          <Box my={3} fontSize='xs' color='whiteAlpha.900' textAlign='center'>
-            すでにアカウントをお持ちですか？
-            <Link href='/login'>
-              <Text
-                as='span'
-                ml={2}
-                textDecoration='underline'
-                cursor='pointer'
-              >
-                ログイン
-              </Text>
-            </Link>
-          </Box>
-        </Flex>
-      </Container>
+            アカウント作成
+          </Flex>
+          <Flex flexDirection='column' justifyContent='space-around' px={6}>
+            <Input
+              type='text'
+              w='100%'
+              backgroundColor='rgb(232 240 254)'
+              placeholder='ユーザー名'
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <Input
+              type='text'
+              w='100%'
+              mt={3}
+              backgroundColor='rgb(232 240 254)'
+              placeholder='メールアドレス'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Input
+              type='password'
+              w='100%'
+              mt={3}
+              backgroundColor='rgb(232 240 254)'
+              placeholder='パスワード'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button
+              mt={3}
+              color='white'
+              backgroundColor='facebook.600'
+              _hover={{ backgroundColor: 'facebook.500' }}
+              onClick={createUser}
+              disabled={!username || !email || !email}
+            >
+              新規登録
+            </Button>
+            <Box my={3} fontSize='xs' color='whiteAlpha.900' textAlign='center'>
+              すでにアカウントをお持ちですか？
+              <Link href='/login'>
+                <Text
+                  as='span'
+                  ml={2}
+                  textDecoration='underline'
+                  cursor='pointer'
+                >
+                  ログイン
+                </Text>
+              </Link>
+            </Box>
+          </Flex>
+        </Container>
+      </Layout>
     </Flex>
   );
 };

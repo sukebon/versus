@@ -15,6 +15,7 @@ const New = () => {
     if (!user) router.push('/login');
   }, [user, router]);
 
+  //Postを作成
   const postCreate = async () => {
     setSpinner(true);
     try {
@@ -23,7 +24,7 @@ const New = () => {
         title,
       });
       window.alert('作成しました。');
-      router.push(`/dashboard/${docRef.id}`);
+      router.push(`/dashboard/media/${docRef.id}`);
     } catch (e) {
       console.error('Error adding document: ', e);
     } finally {
@@ -89,7 +90,7 @@ const New = () => {
               <Flex flexDirection='column' alignItems='center'>
                 <Button
                   w='200px'
-                  mt={12}
+                  mt={6}
                   mx='auto'
                   colorScheme='orange'
                   cursor='pointer'

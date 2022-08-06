@@ -130,7 +130,7 @@ const Dashboard = () => {
                             </Flex>
                           </a>
 
-                          <Link href={`/dashboard/${post.id}`}>
+                          <Link href={`/dashboard/media/${post.id}`}>
                             <a>
                               <Flex
                                 flexDirection='column'

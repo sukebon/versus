@@ -1,0 +1,14 @@
+.img {
+  object-fit: cover;
+  width: 100%;
+  max-width: 500px;
+  max-height: 500px;
+  transition: 0.2s;
+
+  &:hover {
+    outline: 5px solid rgb(39, 39, 52);
+    outline-offset: -5px;
+    // transform: translateY(-10px);
+    // transform: scale(1.1);
+  }
+}

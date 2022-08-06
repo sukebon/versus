@@ -34,12 +34,13 @@ import {
   ref,
   uploadBytes,
 } from 'firebase/storage';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { auth, db, storage } from '../../../firebase';
-import Layout from '../../components/Layout';
+import { auth, db, storage } from '../../../../firebase';
+import Layout from '../../../components/Layout';
 
-const DashboardId = () => {
+const MediadId = () => {
   const router = useRouter();
   const { id } = router.query;
   const user = auth.currentUser;
@@ -148,6 +149,7 @@ const DashboardId = () => {
           </Box>
           <a href={`/app/${id}`} target='_blank' rel='noopener noreferrer'>
             <Box
+              mr={6}
               cursor='pointer'
               fontSize='xs'
               transition='0.5s'
@@ -156,10 +158,23 @@ const DashboardId = () => {
               アプリを確認
             </Box>
           </a>
+          <Link href={`/dashboard/title/${id}`}>
+            <a>
+              <Box
+                cursor='pointer'
+                fontSize='xs'
+                transition='0.5s'
+                _hover={{ color: 'gray.500' }}
+              >
+                タイトル設定
+              </Box>
+            </a>
+          </Link>
         </Flex>
-        <Container maxW='800px' mt={12}>
+
+        <Container maxW='800px' mt={12} pb={6}>
           <Box as='h1' fontSize='2xl' fontWeight='bold'>
-            設定画面
+            メディア設定
           </Box>
 
           <Box mt={6}>
@@ -219,7 +234,7 @@ const DashboardId = () => {
                     }) => (
                       <Tr key={image.id}>
                         <Td>
-                          <Box w='150px'>
+                          <Box w='80px'>
                             <img src={image.url} />
                           </Box>
                         </Td>
@@ -274,11 +289,13 @@ const DashboardId = () => {
                   }}
                 />
               </Box>
-              <Flex mt={6}>
-                <Button onClick={onfileUpload} mr={3}>
+              <Flex mt={6} w='100%' justifyContent='space-between'>
+                <Button onClick={() => setFileUpload('')} w='50%' mr={3}>
+                  キャンセル
+                </Button>
+                <Button onClick={onfileUpload} w='50%' colorScheme='facebook'>
                   OK
                 </Button>
-                <Button onClick={() => setFileUpload('')}>キャンセル</Button>
               </Flex>
             </Flex>
           </Flex>
@@ -288,4 +305,4 @@ const DashboardId = () => {
   );
 };
 
-export default DashboardId;
+export default MediadId;

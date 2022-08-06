@@ -1,5 +1,14 @@
+/* eslint-disable @next/next/no-img-element */
 import { Box, Button, Flex } from '@chakra-ui/react';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  query,
+  where,
+} from 'firebase/firestore';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -7,15 +16,35 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { db } from '../../../firebase';
 import Layout from '../../components/Layout';
+import Styles from '../../styles/AppId.module.scss';
 
 const AppId: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
+  const [title, setTitle] = useState('');
   const [leftImage, setLeftImage] = useState('');
   const [rightImage, setRightImage] = useState('');
-  const [toggle, setToggle] = useState(true);
+  const [startButton, setStartButton] = useState(true);
   const [storageImages, setStorageImages] = useState<any>([]); //データベースからイメージ画像を取得
   const [imagesArray, setImagesArray] = useState<any>([]);
+  const [rightFadeout, setRightFadeout] = useState(false);
+  const [leftFadeout, setLeftFadeout] = useState(false);
+
+  //postsからタイトルを取得
+  useEffect(() => {
+    const getPost = async () => {
+      try {
+        const docRef = doc(db, 'posts', `${id}`);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setTitle(docSnap.data().title);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getPost();
+  }, [id]);
 
   //イメージ画像データ一覧を取得
   useEffect(() => {
@@ -38,8 +67,9 @@ const AppId: NextPage = () => {
       }
     };
     getImages();
-  }, [id, toggle]);
+  }, [id, startButton]);
 
+  //スタート
   const onStartClick = () => {
     const shuffleImages = shuffle(storageImages);
     if (leftImage === '') {
@@ -51,24 +81,39 @@ const AppId: NextPage = () => {
       secondImage && setRightImage(secondImage.url);
     }
     setImagesArray(shuffleImages);
-    setToggle(false);
+    setStartButton(false);
   };
 
+  //リセット
   const onResetClick = () => {
     setImagesArray(storageImages);
     setLeftImage('');
     setRightImage('');
-    setToggle(true);
+    setStartButton(true);
   };
 
+  //左の画像を選択した場合の処理
   const leftSelectClick = () => {
-    const image = imagesArray.shift();
-    image ? setRightImage(image.url) : setRightImage('');
+    setRightFadeout(true);
+    setTimeout(() => {
+      const image = imagesArray.shift();
+      image ? setRightImage(image.url) : setRightImage('');
+      setTimeout(() => {
+        setRightFadeout(false);
+      }, 500);
+    }, 500);
   };
 
+  //右の画像を選択した場合の処理
   const rightSelectClick = () => {
-    const image = imagesArray.shift();
-    image ? setLeftImage(image.url) : setLeftImage('');
+    setLeftFadeout(true);
+    setTimeout(() => {
+      const image = imagesArray.shift();
+      image ? setLeftImage(image.url) : setLeftImage('');
+      setTimeout(() => {
+        setLeftFadeout(false);
+      }, 500);
+    }, 500);
   };
 
   //シャッフル関数
@@ -88,9 +133,9 @@ const AppId: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <Layout>
-        <Box as='main' w='100%' pt='70px'>
+        <Box as='main' w='100%' minH='100vh' pt='70px' pb='70px'>
           <Flex
-            mt={12}
+            mt={6}
             w='100%'
             maxW='1000px'
             mx='auto'
@@ -98,47 +143,99 @@ const AppId: NextPage = () => {
             alignItems='center'
             flexDirection='column'
           >
-            <Box as='h1' textAlign='center'>
-              どちらがいいですか？
-              <br />
-              好きな方をクリックしてください
-            </Box>
-            <Box>
-              {toggle && (
-                <Button mt={6} onClick={onStartClick}>
-                  スタート
-                </Button>
-              )}
-              {(!leftImage || !rightImage) && !toggle && (
-                <Button mt={6} onClick={onResetClick}>
-                  リセット
-                </Button>
-              )}
-            </Box>
-            <Flex mt={6} w='100%' justifyContent='center'>
-              {leftImage && (
-                <Flex
-                  justifyContent='center'
-                  cursor='pointer'
-                  onClick={leftSelectClick}
-                  width='100%'
-                >
-                  <img src={leftImage} alt={''} width={500} height={500} />
-                </Flex>
-              )}
-              {rightImage && (
-                <Flex
-                  justifyContent='center'
-                  cursor='pointer'
-                  onClick={rightSelectClick}
-                  width='100%'
-                >
-                  <img src={rightImage} alt={''} width={500} height={500} />
-                </Flex>
-              )}
+            <Flex mt={6} p={6} w='100%' justifyContent='center'>
+              <Flex
+                justifyContent='center'
+                cursor='pointer'
+                onClick={leftSelectClick}
+                width={leftImage ? '100%' : 0}
+                transition='0.3s'
+                opacity={leftFadeout ? '0' : '1'}
+              >
+                <img
+                  src={leftImage ? leftImage : ''}
+                  alt={''}
+                  className={Styles.img}
+                />
+              </Flex>
+
+              <Flex
+                justifyContent='center'
+                cursor='pointer'
+                onClick={rightSelectClick}
+                width={rightImage ? '100%' : 0}
+                transition='0.3s'
+                opacity={rightFadeout ? '0' : '1'}
+              >
+                <img
+                  src={rightImage ? rightImage : ''}
+                  alt={''}
+                  className={Styles.img}
+                />
+              </Flex>
             </Flex>
           </Flex>
+          <Box width='100%' mt={6} textAlign='center'>
+            {(!leftImage || !rightImage) && !startButton && (
+              <Flex flexDirection='column' alignItems='center'>
+                <Button
+                  w='100%'
+                  maxW='250px'
+                  onClick={() => {
+                    window.alert('投票ありがとうございました！');
+                    onResetClick();
+                  }}
+                  colorScheme='orange'
+                >
+                  投票する
+                </Button>
+                <Button w='100%' maxW='250px' mt={3} onClick={onResetClick}>
+                  リセット
+                </Button>
+              </Flex>
+            )}
+          </Box>
         </Box>
+        {(leftFadeout || rightFadeout) && (
+          <Box
+            position='absolute'
+            top='0'
+            left='0'
+            w='100%'
+            h='100%'
+            zIndex={10000}
+          ></Box>
+        )}
+        {startButton && (
+          <Flex
+            flexDirection='column'
+            position='absolute'
+            w='80%'
+            top='50%'
+            left='50%'
+            transform='translate(-50%,-50%)'
+          >
+            <Box as='h1' textAlign='center' fontSize='3xl'>
+              {title}
+            </Box>
+            <Box as='h2' mt={6} textAlign='center' fontSize='3xl'>
+              今から表示される画像の好きな方を
+              <br />
+              クリックしてください
+            </Box>
+            <Button
+              maxW='350px'
+              w='100%'
+              mt={6}
+              mx='auto'
+              onClick={onStartClick}
+              size='lg'
+              colorScheme='twitter'
+            >
+              スタート
+            </Button>
+          </Flex>
+        )}
       </Layout>
     </>
   );
