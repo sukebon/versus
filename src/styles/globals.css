@@ -24,3 +24,11 @@ a {
     background: black;
   }
 }
+.mediaImg {
+  width: 300px;
+  height: 300px;
+}
+
+input[type='file'] {
+  display: none;
+}

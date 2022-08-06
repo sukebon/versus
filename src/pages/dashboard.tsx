@@ -48,26 +48,41 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const postDelete = async (queryId: string) => {
+  const postDelete = async (postId: string) => {
     const result = window.confirm('削除して宜しいでしょうか？');
     if (!result) return;
-    await deleteDoc(doc(db, 'posts', queryId));
-    // await deleteDoc(doc(db, 'images', queryId));
-    // const desertRef = ref(storage, path);
-    // await deleteObject(desertRef);
+    await deleteDoc(doc(db, 'posts', postId));
+    await imagesStorageDelete(postId);
+  };
+
+  //POSTIDのイメージを全て取得して削除する関数（imagesコレクション・storage）
+  const imagesStorageDelete = async (postId: string) => {
+    const q = query(collection(db, 'images'), where('postId', '==', postId));
+    const querySnapshot = await getDocs(q);
+
+    const images = querySnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    images.forEach(async (image: any) => {
+      await deleteDoc(doc(db, 'images', image.id));
+      const desertRef = ref(storage, image.path);
+      await deleteObject(desertRef);
+    });
   };
 
   return (
     <>
       {user && (
         <Layout>
-          <Flex h='100vh' pt='70px' backgroundColor='#f7f7f7'>
+          <Flex as='main' h='100vh' pt='70px' backgroundColor='#f7f7f7'>
             <Container maxW='800px' mt={12}>
               <Box as='h1' fontSize='2xl' fontWeight='bold'>
                 ダッシュボード
               </Box>
               <Box mt={6}>
                 <Button
+                  width='200px'
                   colorScheme='facebook'
                   disabled={posts.length >= 3 ? true : false}
                   onClick={() => router.push('/new')}

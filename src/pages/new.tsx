@@ -1,5 +1,6 @@
 import { Box, Button, Container, Flex, Input, Spinner } from '@chakra-ui/react';
 import { addDoc, collection } from 'firebase/firestore';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { auth, db } from '../../firebase';
@@ -63,8 +64,7 @@ const New = () => {
           >
             <Container mt={12}>
               <Flex flexDirection='column' alignItems='center'>
-                <Box as='h1'>サービス情報を入力</Box>
-                <Box as='h2'>下記入力欄を記入してください。</Box>
+                <Box as='h1'>アプリを作成</Box>
               </Flex>
               <Flex
                 flexDirection='column'
@@ -75,7 +75,9 @@ const New = () => {
                 borderRadius={6}
               >
                 <Box fontWeight='bold'>タイトル</Box>
-                <Box fontSize='xs'>アプリのタイトルを設定してください。</Box>
+                <Box mt={1} color='gray.500' fontSize='xs'>
+                  作成するアプリの名前を入力してください。
+                </Box>
                 <Input
                   type='text'
                   mt={3}
@@ -83,24 +85,32 @@ const New = () => {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
-                <Box fontWeight='bold' mt={6}>
-                  サービスID
-                </Box>
-                <Box fontSize='xs'>サービスIDは作成するページのURLです。</Box>
-                <Input type='text' mt={3} borderColor='gray.400' />
               </Flex>
-              <Flex>
+              <Flex flexDirection='column' alignItems='center'>
                 <Button
                   w='200px'
                   mt={12}
                   mx='auto'
                   colorScheme='orange'
-                  justifySelf='center'
                   cursor='pointer'
+                  disabled={!title}
                   onClick={() => postCreate()}
                 >
                   作成する
                 </Button>
+                <Link href='/dashboard'>
+                  <a>
+                    <Button
+                      w='100px'
+                      mt={6}
+                      mx='auto'
+                      justifySelf='center'
+                      cursor='pointer'
+                    >
+                      戻る
+                    </Button>
+                  </a>
+                </Link>
               </Flex>
             </Container>
           </Box>
