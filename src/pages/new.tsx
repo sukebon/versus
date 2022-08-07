@@ -1,16 +1,26 @@
-import { Box, Button, Container, Flex, Input, Spinner } from '@chakra-ui/react';
-import { addDoc, collection } from 'firebase/firestore';
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  Input,
+  Spinner,
+  Textarea,
+} from '@chakra-ui/react';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { auth, db } from '../../firebase';
 import Layout from '../components/Layout';
+import SpinnerArea from '../components/SpinnerArea';
 
 const New = () => {
   const user = auth.currentUser;
   const router = useRouter();
   const [spinner, setSpinner] = useState(false);
   const [title, setTitle] = useState('');
+  const [desc, setDesc] = useState('');
   useEffect(() => {
     if (!user) router.push('/login');
   }, [user, router]);
@@ -22,6 +32,8 @@ const New = () => {
       const docRef = await addDoc(collection(db, 'posts'), {
         user: user?.uid,
         title,
+        desc,
+        timestamp: serverTimestamp(),
       });
       window.alert('作成しました。');
       router.push(`/dashboard/media/${docRef.id}`);
@@ -36,34 +48,14 @@ const New = () => {
     <>
       {user && (
         <Layout>
-          {spinner && (
-            <Flex
-              position='fixed'
-              width='100%'
-              height='100vh'
-              justifyContent='center'
-              alignItems='center'
-              zIndex={10}
-            >
-              <Spinner
-                thickness='4px'
-                speed='0.65s'
-                emptyColor='gray.200'
-                color='blue.500'
-                size='xl'
-                position='absolute'
-                zIndex={100}
-                style={{ transform: 'translate(-50%,-50%)' }}
-              />
-            </Flex>
-          )}
+          <SpinnerArea spinner={spinner} />
           <Box
             h='100vh'
             backgroundColor='#f7f7f7'
             pt='70px'
             position='relative'
           >
-            <Container mt={12}>
+            <Container mt={12} maxW='800px'>
               <Flex flexDirection='column' alignItems='center'>
                 <Box as='h1'>アプリを作成</Box>
               </Flex>
@@ -85,6 +77,18 @@ const New = () => {
                   borderColor='gray.400'
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
+                />
+                <Box mt={6} fontWeight='bold'>
+                  説明
+                </Box>
+                <Box mt={1} color='gray.500' fontSize='xs'>
+                  作成するアプリの説明を記入してください。
+                </Box>
+                <Textarea
+                  mt={3}
+                  borderColor='gray.400'
+                  value={desc}
+                  onChange={(e) => setDesc(e.target.value)}
                 />
               </Flex>
               <Flex flexDirection='column' alignItems='center'>

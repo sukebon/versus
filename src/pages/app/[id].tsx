@@ -22,6 +22,7 @@ const AppId: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const [title, setTitle] = useState('');
+  const [desc, setDesc] = useState('');
   const [leftImage, setLeftImage] = useState('');
   const [rightImage, setRightImage] = useState('');
   const [startButton, setStartButton] = useState(true);
@@ -38,6 +39,7 @@ const AppId: NextPage = () => {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setTitle(docSnap.data().title);
+          setDesc(docSnap.data().desc);
         }
       } catch (error) {
         console.log(error);
@@ -144,6 +146,7 @@ const AppId: NextPage = () => {
             flexDirection='column'
           >
             <Flex mt={6} p={6} w='100%' justifyContent='center'>
+              {/* 左の画像 */}
               <Flex
                 justifyContent='center'
                 cursor='pointer'
@@ -156,9 +159,15 @@ const AppId: NextPage = () => {
                   src={leftImage ? leftImage : ''}
                   alt={''}
                   className={Styles.img}
+                  style={
+                    !rightImage
+                      ? { pointerEvents: 'none' }
+                      : { pointerEvents: 'initial' }
+                  }
                 />
               </Flex>
 
+              {/* 右の画像 */}
               <Flex
                 justifyContent='center'
                 cursor='pointer'
@@ -171,6 +180,11 @@ const AppId: NextPage = () => {
                   src={rightImage ? rightImage : ''}
                   alt={''}
                   className={Styles.img}
+                  style={
+                    !leftImage
+                      ? { pointerEvents: 'none' }
+                      : { pointerEvents: 'initial' }
+                  }
                 />
               </Flex>
             </Flex>
@@ -211,17 +225,21 @@ const AppId: NextPage = () => {
             flexDirection='column'
             position='absolute'
             w='80%'
-            top='50%'
+            top='45%'
             left='50%'
             transform='translate(-50%,-50%)'
           >
             <Box as='h1' textAlign='center' fontSize='3xl'>
               {title}
             </Box>
-            <Box as='h2' mt={6} textAlign='center' fontSize='3xl'>
-              今から表示される画像の好きな方を
-              <br />
-              クリックしてください
+            <Box
+              as='h2'
+              mt={6}
+              textAlign='center'
+              fontSize='3xl'
+              whiteSpace='pre'
+            >
+              {desc}
             </Box>
             <Button
               maxW='350px'

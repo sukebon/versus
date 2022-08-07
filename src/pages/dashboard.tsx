@@ -1,5 +1,5 @@
 import { AddIcon, DeleteIcon, SettingsIcon, ViewIcon } from '@chakra-ui/icons';
-import { Box, Button, Container, Flex, Text } from '@chakra-ui/react';
+import { Box, Button, Container, Flex, Spinner, Text } from '@chakra-ui/react';
 import {
   collection,
   deleteDoc,
@@ -15,10 +15,12 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { auth, db, storage } from '../../firebase/index';
 import Layout from '../components/Layout';
+import SpinnerArea from '../components/SpinnerArea';
 
 const Dashboard = () => {
   const user = auth.currentUser;
   const router = useRouter();
+  const [spinner, setSpinner] = useState(false);
   const [posts, setPosts] = useState<any>([]);
 
   useEffect(() => {
@@ -51,8 +53,15 @@ const Dashboard = () => {
   const postDelete = async (postId: string) => {
     const result = window.confirm('削除して宜しいでしょうか？');
     if (!result) return;
-    await deleteDoc(doc(db, 'posts', postId));
-    await imagesStorageDelete(postId);
+    setSpinner(true);
+    try {
+      await deleteDoc(doc(db, 'posts', postId));
+      await imagesStorageDelete(postId);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setSpinner(false);
+    }
   };
 
   //POSTIDのイメージを全て取得して削除する関数（imagesコレクション・storage）
@@ -75,6 +84,7 @@ const Dashboard = () => {
     <>
       {user && (
         <Layout>
+          <SpinnerArea spinner={spinner} />
           <Flex as='main' h='100vh' pt='70px' backgroundColor='#f7f7f7'>
             <Container maxW='800px' mt={12}>
               <Box as='h1' fontSize='2xl' fontWeight='bold'>
@@ -84,7 +94,7 @@ const Dashboard = () => {
                 <Button
                   width='200px'
                   colorScheme='facebook'
-                  disabled={posts.length >= 3 ? true : false}
+                  disabled={posts.length >= 5 ? true : false}
                   onClick={() => router.push('/new')}
                 >
                   <AddIcon mr={2} fontSize='sm' />

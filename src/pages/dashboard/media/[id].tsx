@@ -25,7 +25,10 @@ import {
   doc,
   getDoc,
   onSnapshot,
+  orderBy,
   query,
+  serverTimestamp,
+  Timestamp,
   where,
 } from 'firebase/firestore';
 import {
@@ -39,6 +42,8 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { auth, db, storage } from '../../../../firebase';
 import Layout from '../../../components/Layout';
+import SpinnerArea from '../../../components/SpinnerArea';
+import SubHeader from '../../../components/SubHeader';
 
 const MediadId = () => {
   const router = useRouter();
@@ -47,6 +52,7 @@ const MediadId = () => {
   const [title, setTitle] = useState('');
   const [images, setImages] = useState<any>([]);
   const [fileUpload, setFileUpload] = useState<File | any>(null);
+  const [spinner, setSpinner] = useState(false);
 
   useEffect(() => {
     if (!user) router.push('/login');
@@ -59,7 +65,6 @@ const MediadId = () => {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         setTitle(docSnap.data().title);
-        console.log('Document data:', docSnap.data());
       } else {
         console.log('postデータはありません。');
       }
@@ -70,6 +75,7 @@ const MediadId = () => {
   //ファイルをアップロード
   const onfileUpload = async () => {
     if (!fileUpload) return;
+    setSpinner(true);
     const file = fileUpload[0];
     const S = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     const N = 16;
@@ -88,12 +94,27 @@ const MediadId = () => {
         url,
         path,
         name: file.name,
+        updatedAt: serverTimestamp(),
+        createdAt: serverTimestamp(),
       });
       setFileUpload('');
       console.log('upload success');
     } catch (error) {
       console.log(error);
+    } finally {
+      setSpinner(false);
     }
+  };
+
+  //イメージ画像の並べ替え（createdAt 降順）
+  const imagesSort = (arr: any) => {
+    let result = arr.sort(function (
+      a: { createdAt: string },
+      b: { createdAt: string }
+    ) {
+      return a.createdAt > b.createdAt ? -1 : 1; //オブジェクトの昇順ソート
+    });
+    return result;
   };
 
   //イメージ画像データ一覧を取得
@@ -105,12 +126,17 @@ const MediadId = () => {
           where('postId', '==', `${id}`)
         );
         const unsub = onSnapshot(q, (querySnapshot) => {
-          setImages(
-            querySnapshot.docs.map((doc) => ({
-              ...doc.data(),
-              id: doc.id,
-            }))
-          );
+          // setImages(
+          //   querySnapshot.docs.map((doc) => ({
+          //     ...doc.data(),
+          //     id: doc.id,
+          //   }))
+          // );
+          const array = querySnapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          }));
+          setImages(imagesSort(array));
         });
       } catch (error) {
         console.log(error);
@@ -132,51 +158,16 @@ const MediadId = () => {
       console.log(error);
     }
   };
-  console.log(fileUpload);
+
   return (
     <Layout>
+      <SpinnerArea spinner={spinner} />
       <Box as='main' minH='100vh' pt='70px' backgroundColor='#f7f7f7'>
-        <Flex p={3} justifyContent='center' backgroundColor='white'>
-          <Box
-            mr={6}
-            cursor='pointer'
-            fontSize='xs'
-            transition='0.5s'
-            _hover={{ color: 'gray.500' }}
-            onClick={() => router.push('/dashboard')}
-          >
-            ダッシュボード
-          </Box>
-          <a href={`/app/${id}`} target='_blank' rel='noopener noreferrer'>
-            <Box
-              mr={6}
-              cursor='pointer'
-              fontSize='xs'
-              transition='0.5s'
-              _hover={{ color: 'gray.500' }}
-            >
-              アプリを確認
-            </Box>
-          </a>
-          <Link href={`/dashboard/title/${id}`}>
-            <a>
-              <Box
-                cursor='pointer'
-                fontSize='xs'
-                transition='0.5s'
-                _hover={{ color: 'gray.500' }}
-              >
-                タイトル設定
-              </Box>
-            </a>
-          </Link>
-        </Flex>
-
+        <SubHeader id={id} />
         <Container maxW='800px' mt={12} pb={6}>
           <Box as='h1' fontSize='2xl' fontWeight='bold'>
             メディア設定
           </Box>
-
           <Box mt={6}>
             <FormControl w='200px'>
               <FormLabel
@@ -264,7 +255,7 @@ const MediadId = () => {
             position='fixed'
             top='0'
             left='0'
-            zIndex={1000}
+            zIndex={100}
           >
             <Flex
               p={3}

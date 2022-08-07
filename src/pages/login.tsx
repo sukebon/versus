@@ -107,7 +107,7 @@ const Login = () => {
             </Button>
             <Box my={3} fontSize='xs' color='whiteAlpha.900' textAlign='center'>
               アカウントをお持ちでないですか？
-              <Link href='/signup'>
+              <Link href='/register'>
                 <a>
                   <Text
                     as='span'

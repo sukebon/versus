@@ -37,7 +37,7 @@ const Header = () => {
                 </Button>
               </a>
             </Link>
-            <Link href='/signup'>
+            <Link href='/register'>
               <a>
                 <Button size='sm' colorScheme='facebook'>
                   新規登録
